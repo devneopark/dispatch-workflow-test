@@ -1,0 +1,3 @@
+rootProject.name = 'dispatch-workflow-test'
+include 'foo'
+include 'bar'
