@@ -16,6 +16,8 @@ jobs:
 
       - name: "1단계: 코드 빌드"
         run: |
-          echo "코드를 빌드합니다...: ${{ inputs.module }}"
-          ./gradlew :${{ inputs.module }}:clean
-          ./gradlew :${{ inputs.module }}:build
+          MODULE_PATH=${{ inputs.module }}
+          MODULE="${MODULE_PATH/\//:}"
+          echo "코드를 빌드합니다...: $MODULE"
+          ./gradlew :$MODULE:clean
+          ./gradlew :$MODULE:build

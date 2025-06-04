@@ -10,8 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.repository_owner == 'devneopark' }}
     outputs:
-      is-foo-changed: ${{ steps.check.outputs.is-foo-changed }}
-      is-bar-changed: ${{ steps.check.outputs.is-bar-changed }}
+      changes-json: ${{ steps.check.outputs.changes-json }}
 
     steps:
       - name: "0단계: 브랜치 체크아웃"
@@ -25,9 +24,9 @@ jobs:
           CHANGED=$(git diff-tree --no-commit-id --name-only -r HEAD)
           echo "$CHANGED"
           
-          CHANGED_MODULES=$(echo "$CHANGED" | grep 'modules/' | awk -F/ '{print $1"/"$2"/"$3}' | sort -u)
+          CHANGED_MODULES=$(echo "$CHANGED" | grep 'modules/' | awk -F/ '{print $1"/"$2}' | sort -u)
           echo "변경된 모듈:"
-          echo "'$CHANGED_MODULES'"
+          echo "$CHANGED_MODULES"
           
           if [[ -n "${CHANGED_MODULES//[$'\n\r[:space:]']}" ]]; then
             CHANGES_JSON="[$(echo "$CHANGED_MODULES" | sed 's/.*/"&"/' | paste -sd, -)]"
@@ -35,29 +34,15 @@ jobs:
             CHANGES_JSON="[]"
           fi
           
-          echo "json: $CHANGES_JSON"
+          echo "changes-json=$CHANGES_JSON" >> $GITHUB_OUTPUT
 
-#          if grep -q '^foo/' <<< "$CHANGED"; then
-#            echo "foo 모듈에서 변경사항이 있습니다."
-#            echo "is-foo-changed=true" >> $GITHUB_OUTPUT
-#          fi
-#          if grep -q '^bar/' <<< "$CHANGED"; then
-#            echo "bar 모듈에서 변경사항이 있습니다."
-#            echo "is-bar-changed=true" >> $GITHUB_OUTPUT
-#          fi
-
-  release-foo:
+  release:
     needs: detect-release
-    if: ${{ needs.detect-release.outputs.is-foo-changed == 'true' }}
+    if: ${{ needs.detect-release.outputs.changes-json != '[]' }}
+    strategy:
+      matrix:
+        module: ${{ fromJSON(needs.detect-release.outputs.changes-json) }}
     uses: ./.github/workflows/release.yml
     with:
-      module: foo
-    secrets: inherit
-
-  release-bar:
-    needs: detect-release
-    if: ${{ needs.detect-release.outputs.is-bar-changed == 'true' }}
-    uses: ./.github/workflows/release.yml
-    with:
-      module: bar
+      module: ${{ matrix.module }}
     secrets: inherit
