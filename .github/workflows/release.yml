@@ -1,0 +1,21 @@
+name: Deploy Module
+
+on:
+  workflow_call:
+    inputs:
+      module:
+        required: true
+        type: string
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "0단계: 체크아웃"
+        uses: actions/checkout@v4
+
+      - name: "1단계: 코드 빌드"
+        run: |
+          echo "코드를 빌드합니다...: ${{ inputs.module }}"
+          ./gradlew :${{ inputs.module }}:clean
+          ./gradlew :${{ inputs.module }}:build
