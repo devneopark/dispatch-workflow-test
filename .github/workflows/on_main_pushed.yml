@@ -25,14 +25,26 @@ jobs:
           CHANGED=$(git diff-tree --no-commit-id --name-only -r HEAD)
           echo "$CHANGED"
           
-          if grep -q '^foo/' <<< "$CHANGED"; then
-            echo "foo 모듈에서 변경사항이 있습니다."
-            echo "is-foo-changed=true" >> $GITHUB_OUTPUT
+          CHANGED_MODULES=$(echo "$CHANGED" | grep 'modules/' | awk -F/ '{print $1"/"$2"/"$3}' | sort -u)
+          echo "변경된 모듈:"
+          echo "'$CHANGED_MODULES'"
+          
+          if [[ -n "${CHANGED_MODULES//[$'\n\r[:space:]']}" ]]; then
+            CHANGES_JSON="[$(echo "$CHANGED_MODULES" | sed 's/.*/"&"/' | paste -sd, -)]"
+          else
+            CHANGES_JSON="[]"
           fi
-          if grep -q '^bar/' <<< "$CHANGED"; then
-            echo "bar 모듈에서 변경사항이 있습니다."
-            echo "is-bar-changed=true" >> $GITHUB_OUTPUT
-          fi
+          
+          echo "json: $CHANGES_JSON"
+
+#          if grep -q '^foo/' <<< "$CHANGED"; then
+#            echo "foo 모듈에서 변경사항이 있습니다."
+#            echo "is-foo-changed=true" >> $GITHUB_OUTPUT
+#          fi
+#          if grep -q '^bar/' <<< "$CHANGED"; then
+#            echo "bar 모듈에서 변경사항이 있습니다."
+#            echo "is-bar-changed=true" >> $GITHUB_OUTPUT
+#          fi
 
   release-foo:
     needs: detect-release
