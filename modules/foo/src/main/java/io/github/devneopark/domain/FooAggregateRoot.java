@@ -4,4 +4,6 @@ public class FooAggregateRoot {
 
     private String id;
 
+    private String name;
+
 }

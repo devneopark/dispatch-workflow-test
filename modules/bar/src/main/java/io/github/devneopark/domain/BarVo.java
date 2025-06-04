@@ -4,4 +4,6 @@ public class BarVo {
 
     private String value;
 
+    private String status;
+
 }

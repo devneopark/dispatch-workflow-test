@@ -6,4 +6,8 @@ public class MyUtil {
         // body
     }
 
+    public static void test2() {
+        // body
+    }
+
 }
