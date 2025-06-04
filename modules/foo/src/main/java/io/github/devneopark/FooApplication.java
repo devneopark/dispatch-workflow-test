@@ -1,4 +1,4 @@
-package io.devneopark;
+package io.github.devneopark;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
