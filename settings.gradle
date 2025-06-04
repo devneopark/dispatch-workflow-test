@@ -1,3 +1,6 @@
 rootProject.name = 'dispatch-workflow-test'
+
+include 'modules:common'
+
 include 'modules:foo'
 include 'modules:bar'
