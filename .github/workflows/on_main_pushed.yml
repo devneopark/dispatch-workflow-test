@@ -24,7 +24,11 @@ jobs:
           CHANGED=$(git diff-tree --no-commit-id --name-only -r HEAD)
           echo "$CHANGED"
           
-          CHANGED_MODULES=$(echo "$CHANGED" | grep 'modules/' | awk -F/ '{print $1"/"$2}' | sort -u)
+          CHANGED_MODULES=$(echo "$CHANGED" \
+            | grep 'modules/' \
+            | awk -F/ '{print $1"/"$2}' \
+            | grep -v -E '^modules/(common)' \
+            | sort -u)
           echo "변경된 모듈:"
           echo "$CHANGED_MODULES"
           
